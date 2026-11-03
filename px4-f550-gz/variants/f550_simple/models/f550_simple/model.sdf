@@ -2,7 +2,7 @@
 <sdf version='1.9'>
 <model name='f550'>
 <include merge='true'>
-<uri>model://f550_base</uri>
+<uri>model://f550_base_simple</uri>
 </include>
 <plugin filename="gz-sim-multicopter-motor-model-system"
 name="gz::sim::systems::MulticopterMotorModel">
