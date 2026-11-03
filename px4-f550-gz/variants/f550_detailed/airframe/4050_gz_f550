@@ -1,0 +1,70 @@
+#!/bin/sh
+# @name Gazebo DJI F550
+# @type Hexarotor x
+# @class Copter
+. ${R}etc/init.d/rc.mc_defaults
+# Simulator backend: Gazebo (gz-sim)
+PX4_SIMULATOR=${PX4_SIMULATOR:=gz}
+# World loaded by default (override with PX4_GZ_WORLD=<world> make px4_sitl gz_f550)
+PX4_GZ_WORLD=${PX4_GZ_WORLD:=default}
+# Gazebo model to spawn: Tools/simulation/gz/models/f550/model.sdf (must match the folder name)
+PX4_SIM_MODEL=${PX4_SIM_MODEL:=f550}
+# Spawn pose "x,y,z,roll,pitch,yaw" in metres/radians. z=0.15 puts the body disc ~5 cm above the ground.
+PX4_GZ_MODEL_POSE="0,0,0.15,0,0,0"
+export PX4_GZ_MODEL_POSE
+# Enable the Gazebo simulation bridge
+param set-default SIM_GZ_EN 1
+
+
+# --- Control allocation: geometry of the 6 rotors -------------------------------------
+# PX4 uses FRD axes (x front, y RIGHT, z down); Gazebo uses FLU (y LEFT), so PY = -y(Gazebo).
+# KM > 0 = counter-clockwise (CCW), KM < 0 = clockwise (CW); |KM| matches <momentConstant> (0.06) in the SDF.
+# CA_ROTORn corresponds to <motorNumber>n</motorNumber> and prop_n_link in the SDF:
+#   0 right/CCW   1 left/CW   2 front-left/CCW   3 back-right/CW   4 front-right/CW   5 back-left/CCW
+param set-default CA_AIRFRAME 0
+param set-default CA_ROTOR_COUNT 6
+param set-default CA_ROTOR0_PX 0.0000
+param set-default CA_ROTOR0_PY 0.2750
+param set-default CA_ROTOR0_KM 0.06
+param set-default CA_ROTOR1_PX 0.0000
+param set-default CA_ROTOR1_PY -0.2750
+param set-default CA_ROTOR1_KM -0.06
+param set-default CA_ROTOR2_PX 0.2382
+param set-default CA_ROTOR2_PY -0.1375
+param set-default CA_ROTOR2_KM 0.06
+param set-default CA_ROTOR3_PX -0.2382
+param set-default CA_ROTOR3_PY 0.1375
+param set-default CA_ROTOR3_KM -0.06
+param set-default CA_ROTOR4_PX 0.2382
+param set-default CA_ROTOR4_PY 0.1375
+param set-default CA_ROTOR4_KM -0.06
+param set-default CA_ROTOR5_PX -0.2382
+param set-default CA_ROTOR5_PY -0.1375
+param set-default CA_ROTOR5_KM 0.06
+
+# --- Gazebo actuator outputs: motor n -> function 101+n, mapped to 150..1000 rad/s ---
+param set-default SIM_GZ_EC_FUNC1 101
+param set-default SIM_GZ_EC_FUNC2 102
+param set-default SIM_GZ_EC_FUNC3 103
+param set-default SIM_GZ_EC_FUNC4 104
+param set-default SIM_GZ_EC_FUNC5 105
+param set-default SIM_GZ_EC_FUNC6 106
+param set-default SIM_GZ_EC_MIN1 150
+param set-default SIM_GZ_EC_MIN2 150
+param set-default SIM_GZ_EC_MIN3 150
+param set-default SIM_GZ_EC_MIN4 150
+param set-default SIM_GZ_EC_MIN5 150
+param set-default SIM_GZ_EC_MIN6 150
+param set-default SIM_GZ_EC_MAX1 1000
+param set-default SIM_GZ_EC_MAX2 1000
+param set-default SIM_GZ_EC_MAX3 1000
+param set-default SIM_GZ_EC_MAX4 1000
+param set-default SIM_GZ_EC_MAX5 1000
+param set-default SIM_GZ_EC_MAX6 1000
+
+# --- Misc: hover throttle (~0.49 computed from motorConstant and mass), no datalink-loss action, drag coefficients ---
+param set-default MPC_THR_HOVER 0.5
+param set-default NAV_DLL_ACT 2
+param set-default EKF2_BCOEF_X 0.0
+param set-default EKF2_BCOEF_Y 0.0
+param set-default EKF2_MCOEF 0.12
