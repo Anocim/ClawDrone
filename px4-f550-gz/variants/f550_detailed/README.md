@@ -43,7 +43,7 @@ Spin directions alternate around the vehicle (CCW, CW, CCW, CW, CCW, CW), as on 
 
 ### Rules to respect when modifying anything
 
-1. **The PX4 motor index is the propeller number:** `CA_ROTORn` = `<motorNumber>n</motorNumber>` = `prop_n`.
+1. **The PX4 motor index is the propeller number:** `CA_ROTORn` = `<actuator_number>n</actuator_number>` = `prop_n`.
 2. **PX4 uses FRD axes, Gazebo uses FLU:** `PY(PX4) = -y(Gazebo)`. Forgetting this sign inverts roll and the drone flips on takeoff.
 3. **`KM > 0` means CCW, `KM < 0` means CW**, and must match `<turningDirection>` of the same motor.
    Its magnitude (0.06) should equal `<momentConstant>`.
@@ -57,7 +57,7 @@ The vehicle spawns at z = 0.15 m (`PX4_GZ_MODEL_POSE`); the model has no landing
 
 ## Changing the layout
 
-Edit `<linkName>`, `<turningDirection>` and `<motorNumber>` in `models/f550/model.sdf` and the propeller
+Edit `<linkName>`, `<turningDirection>` and `<actuator_number>` in `models/f550/model.sdf` and the propeller
 poses in `models/f550_base/model.sdf`, then regenerate the parameters:
 
 ```sh

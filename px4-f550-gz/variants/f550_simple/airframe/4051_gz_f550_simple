@@ -1,15 +1,28 @@
 #!/bin/sh
 #
-# @name Gazebo DJI F550
+# @name Gazebo DJI F550 (simple)
 #
 # @type Hexarotor x
 # @class Copter
 #
 . ${R}etc/init.d/rc.mc_defaults
+
+# Simulator backend: Gazebo (gz-sim)
 PX4_SIMULATOR=${PX4_SIMULATOR:=gz}
+# World loaded by default (override with PX4_GZ_WORLD=<world> make px4_sitl gz_f550_simple)
 PX4_GZ_WORLD=${PX4_GZ_WORLD:=default}
+# Gazebo model to spawn: Tools/simulation/gz/models/f550_simple/model.sdf (must match the folder name,
+# and must differ from the detailed variant's "f550")
 PX4_SIM_MODEL=${PX4_SIM_MODEL:=f550_simple}
+
+# Enable the Gazebo simulation bridge
 param set-default SIM_GZ_EN 1
+
+# --- Control allocation: geometry of the 6 rotors -------------------------------------
+# PX4 uses FRD axes (x front, y RIGHT, z down); Gazebo uses FLU (y LEFT), so PY = -y(Gazebo).
+# KM > 0 = counter-clockwise (CCW), KM < 0 = clockwise (CW).
+# CA_ROTORn corresponds to <actuator_number>n</actuator_number> and rotor_n in the SDF:
+#   0 front-right/CCW   1 right/CW   2 back-right/CCW   3 back-left/CW   4 left/CCW   5 front-left/CW
 param set-default CA_AIRFRAME 0
 param set-default CA_ROTOR_COUNT 6
 param set-default CA_ROTOR0_PX 0.2382
@@ -30,6 +43,8 @@ param set-default CA_ROTOR4_KM 0.05
 param set-default CA_ROTOR5_PX 0.2382
 param set-default CA_ROTOR5_PY -0.1375
 param set-default CA_ROTOR5_KM -0.05
+
+# --- Gazebo actuator outputs: motor n -> function 101+n, mapped to 150..1000 rad/s ---
 param set-default SIM_GZ_EC_FUNC1 101
 param set-default SIM_GZ_EC_FUNC2 102
 param set-default SIM_GZ_EC_FUNC3 103
@@ -48,6 +63,10 @@ param set-default SIM_GZ_EC_MAX3 1000
 param set-default SIM_GZ_EC_MAX4 1000
 param set-default SIM_GZ_EC_MAX5 1000
 param set-default SIM_GZ_EC_MAX6 1000
+
+# --- Misc ---
+# Hover throttle. The SDF numbers (mass 1.596 kg, motorConstant 5.2e-6) give ~708 rad/s -> (708-150)/850 = ~0.66;
+# 0.5 is kept because it is what was tested, and PX4's hover-thrust estimator adapts it in flight.
 param set-default MPC_THR_HOVER 0.5
 param set-default NAV_DLL_ACT 2
 # Drag Specific Force:

@@ -7,7 +7,7 @@ Usage:
   python3 gen_ca.py MODEL.sdf MODEL_BASE.sdf --observed left,right,back_right,front_left,back_left,front_right
 
 Without --observed the motor index declared in the SDF (actuator_number or
-motorNumber) is used.
+motorNumber, the deprecated name) is used.
 
 --observed lists, for output functions 101..106 in that order, which propeller
 you see spinning when running in the PX4 shell:

@@ -19,7 +19,7 @@ param set-default SIM_GZ_EN 1
 # --- Control allocation: geometry of the 6 rotors -------------------------------------
 # PX4 uses FRD axes (x front, y RIGHT, z down); Gazebo uses FLU (y LEFT), so PY = -y(Gazebo).
 # KM > 0 = counter-clockwise (CCW), KM < 0 = clockwise (CW); |KM| matches <momentConstant> (0.06) in the SDF.
-# CA_ROTORn corresponds to <motorNumber>n</motorNumber> and prop_n_link in the SDF:
+# CA_ROTORn corresponds to <actuator_number>n</actuator_number> and prop_n_link in the SDF:
 #   0 right/CCW   1 left/CW   2 front-left/CCW   3 back-right/CW   4 front-right/CW   5 back-left/CCW
 param set-default CA_AIRFRAME 0
 param set-default CA_ROTOR_COUNT 6

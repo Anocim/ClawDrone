@@ -57,7 +57,18 @@
 #     models into it makes `git status` show it as modified; this is harmless.
 #     Running `git submodule update` there may remove untracked files, so just
 #     run this script again afterwards.
+#   * It also cleans leftovers that break the launch (see "STALE FILES" below).
 #   * After installing, run the make target printed at the end.
+#
+# STALE FILES (why `make px4_sitl gz_f550` can fail while `gz_f550_simple` works)
+#   PX4 finds the airframe for a make target by listing
+#   build/px4_sitl_default/etc/init.d-posix/airframes and matching "<ID>_<target>".
+#   An old file such as 4051_gz_f550 (the previous name of the simple variant)
+#   makes the target gz_f550 match TWO airframes (4050 and 4051), so the detailed
+#   model cannot start, while gz_f550_simple is not affected. PX4 copies airframes
+#   into the build folder but never deletes them, so such leftovers survive.
+#   This script removes (a) the legacy airframe names listed in LEGACY_AIRFRAMES
+#   and (b) any *_gz_* airframe in the build folder that no longer exists in ROMFS.
 # =============================================================================
 set -euo pipefail   # stop at the first error, on unset variables, and on failed pipes
 
@@ -160,6 +171,11 @@ fi
 AIRFRAMES="$PX4_DIR/ROMFS/px4fmu_common/init.d-posix/airframes"
 MODELS="$PX4_DIR/Tools/simulation/gz/models"
 CMAKE="$AIRFRAMES/CMakeLists.txt"
+BUILD_AF="$PX4_DIR/build/px4_sitl_default/etc/init.d-posix/airframes"   # copy PX4 reads at runtime
+
+# Airframe names used by earlier versions of this repository. They collide with the
+# current ones (same make target or same ID), so they are removed on install/uninstall.
+LEGACY_AIRFRAMES="4051_gz_f550"
 
 [ -d "$AIRFRAMES" ] || { echo "ERROR: $PX4_DIR does not look like PX4-Autopilot (missing $AIRFRAMES). Use --px4 PATH."; exit 1; }
 [ -d "$MODELS" ]    || { echo "ERROR: missing $MODELS. Run 'git submodule update --init --recursive' inside PX4-Autopilot."; exit 1; }
@@ -192,9 +208,35 @@ unregister_airframe() {
   sed -i "/^[[:space:]]*$1[[:space:]]*$/d" "$CMAKE"
 }
 
+# Remove airframes this repository used in the past (ROMFS file, CMakeLists.txt line, build copy).
+clean_legacy_airframes() {
+  for id in $LEGACY_AIRFRAMES; do
+    if [ -e "$AIRFRAMES/$id" ] || [ -e "$BUILD_AF/$id" ] || grep -qE "^[[:space:]]*$id[[:space:]]*$" "$CMAKE"; then
+      echo "--> Removing legacy airframe $id (old name used by this repo; it would clash with the current ones)"
+      rm -f "$AIRFRAMES/$id" "$BUILD_AF/$id"
+      unregister_airframe "$id"
+    fi
+  done
+}
+
+# PX4 copies airframes into the build folder but never deletes them. Remove the *_gz_* copies
+# that no longer have a source file in ROMFS, otherwise a ghost airframe can make a target ambiguous.
+clean_stale_build_airframes() {
+  [ -d "$BUILD_AF" ] || return 0
+  for f in "$BUILD_AF"/*_gz_*; do
+    [ -e "$f" ] || continue
+    b="$(basename "$f")"
+    if [ ! -e "$AIRFRAMES/$b" ]; then
+      echo "--> Removing stale build copy of airframe $b (no longer in ROMFS)"
+      rm -f "$f"
+    fi
+  done
+}
+
 # ----------------------------------------------------------------------------
 # 3. Install (or uninstall) every selected variant
 # ----------------------------------------------------------------------------
+clean_legacy_airframes
 NEED_MESHES=0
 for v in $SELECTED; do
   VDIR="$HERE/variants/$v"
@@ -232,6 +274,20 @@ for v in $SELECTED; do
     done
   done
 
+  #     The make target is the part after the ID ("4050_gz_f550" -> "gz_f550"). Two airframes with
+  #     the same target but different IDs make that target ambiguous for PX4, so refuse too.
+  for id in $(variant_airframes "$v"); do
+    target="${id#*_}"
+    for other in "$AIRFRAMES"/[0-9]*_"$target"; do
+      [ -e "$other" ] || continue
+      if [ "$(basename "$other")" != "$id" ]; then
+        echo "ERROR: make target '$target' would be ambiguous: $(basename "$other") already provides it."
+        echo "       Remove that airframe from PX4 or rename the one in variants/$v/airframe/."
+        exit 1
+      fi
+    done
+  done
+
   # 3b. Gazebo models. Each folder in variants/<v>/models/ is copied as-is to
   #     PX4's models directory. "cp -r dir/." also copies hidden files.
   for m in $(variant_models "$v"); do
@@ -249,6 +305,8 @@ for v in $SELECTED; do
 
   if variant_needs_meshes "$v"; then NEED_MESHES=1; fi
 done
+
+clean_stale_build_airframes
 
 # ----------------------------------------------------------------------------
 # 4. Meshes (visual only)
@@ -280,11 +338,12 @@ fi
 
 # ----------------------------------------------------------------------------
 # 5. Remove parameters PX4 saved in previous runs
-#    `param set-default` in the airframe only applies to parameters that have
-#    NOT been saved before. PX4 SITL stores its saved parameters in
-#    build/px4_sitl_default/rootfs/parameters*.bson, so an old run would keep
-#    the old CA_ROTORn_* values and ignore the new airframe. Deleting these
-#    files (and the dataman database) forces a clean start.
+#    `param set-default` in the airframe only sets DEFAULT values. A value that
+#    was saved explicitly (e.g. `param set CA_ROTOR0_PY ...` followed by
+#    `param save`) is stored in build/px4_sitl_default/rootfs/parameters*.bson
+#    and wins over the default. Deleting these files (and the dataman database)
+#    guarantees a clean start. Note: when SYS_AUTOSTART changes (switching
+#    variants) PX4 already resets its parameters by itself.
 # ----------------------------------------------------------------------------
 echo "--> Removing parameters saved by previous PX4 runs (if any)"
 rm -f "$PX4_DIR"/build/px4_sitl_default/rootfs/parameters*.bson \
