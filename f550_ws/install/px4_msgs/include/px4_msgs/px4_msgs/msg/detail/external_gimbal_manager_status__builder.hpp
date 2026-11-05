@@ -1,0 +1,1 @@
+/home/mapy/ClawDrone/f550_ws/build/px4_msgs/rosidl_generator_cpp/px4_msgs/msg/detail/external_gimbal_manager_status__builder.hpp

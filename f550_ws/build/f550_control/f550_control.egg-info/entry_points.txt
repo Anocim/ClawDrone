@@ -1,0 +1,5 @@
+[console_scripts]
+ball_retriever_node = f550_control.ball_retriever_node:main
+offboard_node = f550_control.offboard_node:main
+safety_node = f550_control.safety_node:main
+

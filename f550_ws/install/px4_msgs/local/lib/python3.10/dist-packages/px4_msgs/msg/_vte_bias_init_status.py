@@ -1,0 +1,1 @@
+/home/mapy/ClawDrone/f550_ws/build/px4_msgs/rosidl_generator_py/px4_msgs/msg/_vte_bias_init_status.py

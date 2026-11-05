@@ -1,0 +1,26 @@
+[2.381s] Invoking command in '/home/mapy/ClawDrone/f550_ws/build/f550_control': AMENT_PREFIX_PATH=/home/mapy/ClawDrone/f550_ws/install/px4_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/mapy/ClawDrone/f550_ws/install/px4_msgs LD_LIBRARY_PATH=/home/mapy/ClawDrone/f550_ws/install/px4_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/mapy/ClawDrone/f550_ws/build/f550_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/mapy/ClawDrone/f550_ws/install/f550_control/lib/python3.10/site-packages:/home/mapy/ClawDrone/f550_ws/install/px4_msgs/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/mapy/ClawDrone/f550_ws/build/f550_control/build --no-deps symlink_data
+[2.891s] running develop
+[3.175s] running egg_info
+[3.175s] creating f550_control.egg-info
+[3.175s] writing f550_control.egg-info/PKG-INFO
+[3.175s] writing dependency_links to f550_control.egg-info/dependency_links.txt
+[3.176s] writing entry points to f550_control.egg-info/entry_points.txt
+[3.176s] writing requirements to f550_control.egg-info/requires.txt
+[3.176s] writing top-level names to f550_control.egg-info/top_level.txt
+[3.176s] writing manifest file 'f550_control.egg-info/SOURCES.txt'
+[3.178s] reading manifest file 'f550_control.egg-info/SOURCES.txt'
+[3.179s] writing manifest file 'f550_control.egg-info/SOURCES.txt'
+[3.180s] running build_ext
+[3.181s] Creating /home/mapy/ClawDrone/f550_ws/install/f550_control/lib/python3.10/site-packages/f550-control.egg-link (link to .)
+[3.182s] Installing ball_retriever_node script to /home/mapy/ClawDrone/f550_ws/install/f550_control/lib/f550_control
+[3.182s] Installing offboard_node script to /home/mapy/ClawDrone/f550_ws/install/f550_control/lib/f550_control
+[3.182s] Installing safety_node script to /home/mapy/ClawDrone/f550_ws/install/f550_control/lib/f550_control
+[3.182s] 
+[3.182s] Installed /home/mapy/ClawDrone/f550_ws/build/f550_control
+[3.182s] running symlink_data
+[3.183s] creating /home/mapy/ClawDrone/f550_ws/install/f550_control/share/ament_index
+[3.183s] creating /home/mapy/ClawDrone/f550_ws/install/f550_control/share/ament_index/resource_index
+[3.183s] creating /home/mapy/ClawDrone/f550_ws/install/f550_control/share/ament_index/resource_index/packages
+[3.183s] symbolically linking /home/mapy/ClawDrone/f550_ws/build/f550_control/resource/f550_control -> /home/mapy/ClawDrone/f550_ws/install/f550_control/share/ament_index/resource_index/packages
+[3.183s] symbolically linking /home/mapy/ClawDrone/f550_ws/build/f550_control/package.xml -> /home/mapy/ClawDrone/f550_ws/install/f550_control/share/f550_control
+[3.212s] Invoked command in '/home/mapy/ClawDrone/f550_ws/build/f550_control' returned '0': AMENT_PREFIX_PATH=/home/mapy/ClawDrone/f550_ws/install/px4_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/mapy/ClawDrone/f550_ws/install/px4_msgs LD_LIBRARY_PATH=/home/mapy/ClawDrone/f550_ws/install/px4_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/mapy/ClawDrone/f550_ws/build/f550_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/mapy/ClawDrone/f550_ws/install/f550_control/lib/python3.10/site-packages:/home/mapy/ClawDrone/f550_ws/install/px4_msgs/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/mapy/ClawDrone/f550_ws/build/f550_control/build --no-deps symlink_data
