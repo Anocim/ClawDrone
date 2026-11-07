@@ -53,19 +53,19 @@ MicroXRCEAgent udp4 -p 8888
 Leave the agent running while PX4 and the ROS 2 nodes are used. PX4 SITL
 starts its `uxrce_dds_client` automatically and connects to UDP port `8888`.
 
-## `px4_msgs` versionado
+## `px4_msgs`
 
 `src/px4_msgs` is included as vendored source, not as a submodule. A normal
 `git clone` therefore obtains the interfaces used by this project without a
 second repository or a `git submodule update` step.
 
-La procedencia está fijada a:
+The origin is fixed to:
 
-| Campo | Valor |
+| Area | Value |
 | --- | --- |
-| Repositorio upstream | `https://github.com/PX4/px4_msgs.git` |
-| Commit importado | `2e892300d8c20d3c29e198e324a10854b40ab8d3` |
-| Commit PX4 indicado por upstream | `d354c4e504d9f22096dd6e0172aab0b7a6b44beb` |
+| Upstream Repo | `https://github.com/PX4/px4_msgs.git` |
+| Imported commit | `2e892300d8c20d3c29e198e324a10854b40ab8d3` |
+| Indicated PX4 commit by upstream | `d354c4e504d9f22096dd6e0172aab0b7a6b44beb` |
 
 Do not edit `src/px4_msgs` by hand. When updating PX4, update these interfaces
 in a separate project commit: select the compatible upstream commit, replace
