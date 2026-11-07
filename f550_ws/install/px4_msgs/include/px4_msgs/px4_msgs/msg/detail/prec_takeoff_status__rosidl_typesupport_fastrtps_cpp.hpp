@@ -1,1 +1,0 @@
-/home/mapy/ClawDrone/f550_ws/build/px4_msgs/rosidl_typesupport_fastrtps_cpp/px4_msgs/msg/detail/prec_takeoff_status__rosidl_typesupport_fastrtps_cpp.hpp

@@ -1,0 +1,21 @@
+# ROS 2 / colcon generated artifacts
+/f550_ws/build/
+/f550_ws/install/
+/f550_ws/log/
+/build/
+/install/
+/log/
+
+# Python generated files
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local environment and editor state
+.env
+.venv/
+.vscode/
+.idea/

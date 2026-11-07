@@ -32,6 +32,25 @@ Each variant has **its own airframe and its own make target**, so both can be in
 Motor layout, tables and parameters of each variant: `variants/<name>/README.md`.
 `./install.sh --list` shows the variants and their make targets.
 
+## ROS 2 workspace (`f550_ws`)
+
+The `f550_ws/` directory is the ROS 2 side of the project. It contains:
+
+| Directory | Purpose |
+|---|---|
+| `f550_ws/src/f550_control/` | Python nodes for offboard control, the autonomous mission and safety handling |
+| `f550_ws/src/px4_msgs/` | Vendored PX4 ROS 2 message and service definitions |
+| `f550_ws/build/`, `install/`, `log/` | Local `colcon` output; regenerated on each machine and not versioned |
+
+`px4_msgs` is deliberately included in this repository at a pinned upstream
+commit. A normal clone therefore contains the message definitions needed by
+the project without initializing another Git repository. Its provenance and
+update procedure are documented in [f550_ws/README.md](f550_ws/README.md).
+
+The Micro XRCE-DDS Agent is different: it is a runtime/build dependency, not
+project source. Clone and build it outside this repository using the version
+required by PX4 1.18 and ROS 2 Humble (`v2.4.2`).
+
 ## Repository layout
 
 ```text
@@ -111,6 +130,58 @@ It also, once per run:
 7. deletes `parameters*.bson` and `dataman` from `build/px4_sitl_default/rootfs/`, so PX4 starts clean (a value you once saved with `param set` + `param save` would otherwise win over the airframe default).
 
 It is idempotent and only touches files inside the PX4 checkout.
+
+### 4. ROS 2 and DDS setup
+
+Build the workspace after cloning this repository. `px4_msgs` is already
+included; do not clone it again:
+
+```sh
+cd ClawDrone/f550_ws
+source /opt/ros/humble/setup.bash
+colcon build --symlink-install
+source install/setup.bash
+```
+
+In a directory outside this repository, clone and build the DDS agent once:
+
+```sh
+git clone -b v2.4.2 https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
+cd Micro-XRCE-DDS-Agent
+mkdir build && cd build
+cmake ..
+make -j$(nproc)
+sudo make install
+```
+
+Use three terminals when running the complete system:
+
+1. DDS agent (from its external build directory):
+
+   ```sh
+   source /opt/ros/humble/setup.bash
+   MicroXRCEAgent udp4 -p 8888
+   ```
+
+2. PX4 SITL/Gazebo:
+
+   ```sh
+   cd ~/PX4-Autopilot
+   make px4_sitl gz_f550
+   ```
+
+3. ROS 2 control node:
+
+   ```sh
+   cd ~/ClawDrone/f550_ws
+   source /opt/ros/humble/setup.bash
+   source install/setup.bash
+   ros2 run f550_control offboard_node
+   ```
+
+Replace the last command with `ball_retriever_node` or `safety_node` for the
+other control modes. PX4 SITL starts its uXRCE-DDS client automatically and
+connects to the agent on UDP port `8888`.
 
 ## Running the simulation
 
@@ -215,6 +286,19 @@ ls ~/PX4-Autopilot/build/px4_sitl_default/etc/init.d-posix/airframes | grep f550
 ```sh
 GZ_VERBOSE=4 make px4_sitl gz_f550 2>&1 | tee /tmp/f550.log
 ```
+
+### ROS 2 and DDS verification
+
+From `f550_ws`, after sourcing ROS 2 and the workspace:
+
+```sh
+colcon list
+ros2 interface show px4_msgs/msg/VehicleCommand
+ros2 topic list
+```
+
+`colcon list` must show `px4_msgs` and `f550_control`. With the DDS agent and
+PX4 running, `ros2 topic list` should contain `/fmu/in/...` and `/fmu/out/...`.
 
 ## Adding a new variant
 
