@@ -148,11 +148,17 @@ In a directory outside this repository, clone and build the DDS agent once:
 ```sh
 git clone -b v2.4.2 https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
 cd Micro-XRCE-DDS-Agent
+# v2.4.2 references the retired Fast-DDS branch "2.12.x".
+sed -i 's/set(_fastdds_tag 2.12.x)/set(_fastdds_tag v2.12.2)/' CMakeLists.txt
 mkdir build && cd build
 cmake ..
 make -j$(nproc)
 sudo make install
 ```
+
+If the first `make` failed while checking out `2.12.x`, run `rm -rf build`
+from the agent repository after applying the replacement above, then create
+the build directory and repeat the configuration and compilation steps.
 
 Use three terminals when running the complete system:
 

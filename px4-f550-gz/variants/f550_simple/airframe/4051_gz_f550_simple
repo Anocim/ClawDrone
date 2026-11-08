@@ -68,7 +68,9 @@ param set-default SIM_GZ_EC_MAX6 1000
 # Hover throttle. The SDF numbers (mass 1.596 kg, motorConstant 5.2e-6) give ~708 rad/s -> (708-150)/850 = ~0.66;
 # 0.5 is kept because it is what was tested, and PX4's hover-thrust estimator adapts it in flight.
 param set-default MPC_THR_HOVER 0.5
-param set-default NAV_DLL_ACT 2
+# Disable the GCS-link-loss failsafe for autonomous/offboard SITL. PX4 otherwise
+# requires a GCS connection before arming when NAV_DLL_ACT is greater than zero.
+param set-default NAV_DLL_ACT 0
 # Drag Specific Force:
 param set-default EKF2_BCOEF_X 0.0
 param set-default EKF2_BCOEF_Y 0.0

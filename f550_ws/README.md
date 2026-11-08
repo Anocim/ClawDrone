@@ -34,12 +34,20 @@ directory of your choice outside the project. From that external directory:
 ```bash
 git clone -b v2.4.2 https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
 cd Micro-XRCE-DDS-Agent
+# v2.4.2 references the retired Fast-DDS branch "2.12.x".
+sed -i 's/set(_fastdds_tag 2.12.x)/set(_fastdds_tag v2.12.2)/' CMakeLists.txt
 mkdir build
 cd build
 cmake ..
 make -j$(nproc)
 sudo make install
 ```
+
+If `make` was already run before applying this workaround, remove only the
+failed generated build directory (`rm -rf build`) and repeat the `mkdir`,
+`cmake`, `make` and install commands. The required agent remains `v2.4.2`;
+the change only replaces a deleted upstream branch with its `v2.12.2` release
+tag.
 
 Build the agent once. Keep its source and build directories outside the
 ClawDrone checkout. For each simulation session, source the ROS 2 environment
