@@ -1,0 +1,9 @@
+#!/bin/sh
+#
+# @name Gazebo simple f550 with downward camera
+#
+# @type Hexarotor
+
+PX4_SIM_MODEL=${PX4_SIM_MODEL:=f550_simple_mono_cam_down}
+
+. ${R}etc/init.d-posix/airframes/4051_gz_f550_simple

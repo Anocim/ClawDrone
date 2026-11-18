@@ -1,0 +1,29 @@
+[2.392s] Invoking command in '/home/alejandro/ClawDrone/ClawDrone/f550_ws/src/build/f550_vision': PS1=(yolo_env) \[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ PYTHONPATH=/home/alejandro/ClawDrone/ClawDrone/f550_ws/src/build/f550_vision/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/alejandro/ClawDrone/ClawDrone/f550_ws/src/install/f550_vision/lib/python3.10/site-packages:${PYTHONPATH} VIRTUAL_ENV_PROMPT=(yolo_env) /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/alejandro/ClawDrone/ClawDrone/f550_ws/src/build/f550_vision/build --no-deps symlink_data
+[3.445s] running develop
+[4.181s] running egg_info
+[4.182s] creating f550_vision.egg-info
+[4.183s] writing f550_vision.egg-info/PKG-INFO
+[4.183s] writing dependency_links to f550_vision.egg-info/dependency_links.txt
+[4.183s] writing entry points to f550_vision.egg-info/entry_points.txt
+[4.183s] writing requirements to f550_vision.egg-info/requires.txt
+[4.184s] writing top-level names to f550_vision.egg-info/top_level.txt
+[4.186s] writing manifest file 'f550_vision.egg-info/SOURCES.txt'
+[4.189s] reading manifest file 'f550_vision.egg-info/SOURCES.txt'
+[4.192s] writing manifest file 'f550_vision.egg-info/SOURCES.txt'
+[4.196s] running build_ext
+[4.197s] Creating /home/alejandro/ClawDrone/ClawDrone/f550_ws/src/install/f550_vision/lib/python3.10/site-packages/f550-vision.egg-link (link to .)
+[4.200s] Installing ball_detector script to /home/alejandro/ClawDrone/ClawDrone/f550_ws/src/install/f550_vision/lib/f550_vision
+[4.200s] Installing camera_viewer script to /home/alejandro/ClawDrone/ClawDrone/f550_ws/src/install/f550_vision/lib/f550_vision
+[4.201s] 
+[4.203s] Installed /home/alejandro/ClawDrone/ClawDrone/f550_ws/src/build/f550_vision
+[4.204s] running symlink_data
+[4.204s] creating /home/alejandro/ClawDrone/ClawDrone/f550_ws/src/install/f550_vision/share/ament_index
+[4.204s] creating /home/alejandro/ClawDrone/ClawDrone/f550_ws/src/install/f550_vision/share/ament_index/resource_index
+[4.204s] creating /home/alejandro/ClawDrone/ClawDrone/f550_ws/src/install/f550_vision/share/ament_index/resource_index/packages
+[4.205s] symbolically linking /home/alejandro/ClawDrone/ClawDrone/f550_ws/src/build/f550_vision/resource/f550_vision -> /home/alejandro/ClawDrone/ClawDrone/f550_ws/src/install/f550_vision/share/ament_index/resource_index/packages
+[4.206s] symbolically linking /home/alejandro/ClawDrone/ClawDrone/f550_ws/src/build/f550_vision/package.xml -> /home/alejandro/ClawDrone/ClawDrone/f550_ws/src/install/f550_vision/share/f550_vision
+[4.206s] symbolically linking /home/alejandro/ClawDrone/ClawDrone/f550_ws/src/build/f550_vision/README.md -> /home/alejandro/ClawDrone/ClawDrone/f550_ws/src/install/f550_vision/share/f550_vision
+[4.206s] creating /home/alejandro/ClawDrone/ClawDrone/f550_ws/src/install/f550_vision/share/f550_vision/launch
+[4.206s] symbolically linking /home/alejandro/ClawDrone/ClawDrone/f550_ws/src/build/f550_vision/launch/detector.launch.py -> /home/alejandro/ClawDrone/ClawDrone/f550_ws/src/install/f550_vision/share/f550_vision/launch
+[4.206s] symbolically linking /home/alejandro/ClawDrone/ClawDrone/f550_ws/src/build/f550_vision/launch/camera.launch.py -> /home/alejandro/ClawDrone/ClawDrone/f550_ws/src/install/f550_vision/share/f550_vision/launch
+[4.286s] Invoked command in '/home/alejandro/ClawDrone/ClawDrone/f550_ws/src/build/f550_vision' returned '0': PS1=(yolo_env) \[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ PYTHONPATH=/home/alejandro/ClawDrone/ClawDrone/f550_ws/src/build/f550_vision/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/alejandro/ClawDrone/ClawDrone/f550_ws/src/install/f550_vision/lib/python3.10/site-packages:${PYTHONPATH} VIRTUAL_ENV_PROMPT=(yolo_env) /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/alejandro/ClawDrone/ClawDrone/f550_ws/src/build/f550_vision/build --no-deps symlink_data

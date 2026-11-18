@@ -1,0 +1,9 @@
+# Python packages for the YOLO detector in f550_vision (installed in a virtual
+# environment, NOT with rosdep). torch is installed by scripts/setup_vision_env.sh
+# because the CPU-only build comes from a separate index.
+#
+# numpy<2: ROS 2 Humble's compiled packages are built against NumPy 1.x.
+numpy<2
+ultralytics
+# Once the detector works on your machine, pin the exact versions so every
+# checkout gets the same ones:  pip freeze | grep -iE "^(ultralytics|torch|numpy)=="

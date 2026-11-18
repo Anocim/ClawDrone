@@ -4,7 +4,7 @@
 # =============================================================================
 #
 # WHY THIS SCRIPT EXISTS
-#   For `make px4_sitl gz_<name>` to work, PX4 needs four things that live
+#   For `make px4_sitl gz_<name>` to work, PX4 needs five things that live
 #   inside the PX4-Autopilot checkout, not in this repository:
 #
 #     1. A Gazebo model            -> Tools/simulation/gz/models/<model>/
@@ -16,6 +16,9 @@
 #        `gz_<name>` does not exist)
 #     4. Optional meshes           -> Tools/simulation/gz/models/mrs_robots_description/
 #        (only for the 3D visuals; the physics does not depend on them)
+#     
+#     5. Optional worlds           -> Tools/simulation/gz/worlds/<name>.sdf
+#        (from worlds/; models used only by worlds go in worlds_models/)
 #
 #   This script copies those files from this repository into the right places
 #   and registers the airframe, so nobody has to do it by hand.
@@ -41,6 +44,8 @@
 #                  The bundled meshes are removed only with --variant all (they may
 #                  be shared by several variants).
 #   --list         Show the variants and the `make` target of each, then exit.
+#   --keep-cache   Do not delete build/px4_sitl_default/CMakeCache.txt. By default it is
+#                  deleted so new airframes/worlds get their make target.
 #   -h, --help     Show this header.
 #
 # EXAMPLES
@@ -81,6 +86,10 @@ VARIANT="all"
 WITH_MESHES=1
 UNINSTALL=0
 LIST=0
+KEEP_CACHE=0
+
+WORLDS_SRC="$HERE/worlds"
+WORLD_MODELS_SRC="$HERE/worlds_models"   # optional: models that would use future worlds
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -89,6 +98,7 @@ while [ $# -gt 0 ]; do
     --no-meshes) WITH_MESHES=0; shift ;;
     --uninstall) UNINSTALL=1; shift ;;
     --list)      LIST=1; shift ;;
+    --keep-cache) KEEP_CACHE=1; shift ;;
     -h|--help)   sed -n '2,/^set -euo/p' "$0" | sed '$d'; exit 0 ;;
     *) echo "Unknown argument: $1 (try --help)"; exit 1 ;;
   esac
@@ -131,6 +141,29 @@ variant_needs_meshes() {
   grep -rqs "model://mrs_robots_description" "$HERE/variants/$1/models"
 }
 
+repo_worlds() {
+  find "$WORLDS_SRC" -maxdepth 1 -type f -name '*.sdf' -printf '%f\n' 2>/dev/null | sort || true
+}
+
+# Adds the variants listed in variants/<name>/requires (one per line), recursively.
+expand_requires() {
+  local out="$1" v r changed=1
+  while [ "$changed" = 1 ]; do
+    changed=0
+    for v in $out; do
+      [ -f "$HERE/variants/$v/requires" ] || continue
+      while read -r r || [ -n "$r" ]; do
+        [ -n "$r" ] || continue
+        if grep -qx "$r" <<< "$out"; then continue; fi
+        [ -d "$HERE/variants/$r" ] || { echo "ERROR: variant '$v' requires unknown variant '$r'" >&2; exit 1; }
+        out="$out"$'\n'"$r"
+        changed=1
+      done < "$HERE/variants/$v/requires"
+    done
+  done
+  echo "$out"
+}
+
 # ----------------------------------------------------------------------------
 # --list : show what this repository provides, then exit
 # ----------------------------------------------------------------------------
@@ -145,6 +178,11 @@ if [ "$LIST" = 1 ]; then
       echo "$n   ->   make px4_sitl ${af#*_}"
     done
   done
+  
+  for w in $(repo_worlds); do
+  	echo "world ${w%.sdf}   ->   PX4_GZ_WORLD=${w%.sdf} make px4_sitl <target>"
+  done
+
   exit 0
 fi
 
@@ -163,6 +201,13 @@ else
   [ -n "$(variant_airframes "$VARIANT")" ] || { echo "ERROR: variant '$VARIANT' is an empty placeholder (no file in variants/$VARIANT/airframe/)."; exit 1; }
   SELECTED="$VARIANT"
 fi
+
+# Pull in the variants this one depends on (not when uninstalling: removing
+# the camera variant must not remove the base one).
+if [ "$UNINSTALL" = 0 ]; then
+  SELECTED="$(expand_requires "$SELECTED")"
+fi
+
 [ -n "$SELECTED" ] || { echo "ERROR: no installable variants found in $HERE/variants"; exit 1; }
 
 # ----------------------------------------------------------------------------
@@ -173,6 +218,9 @@ MODELS="$PX4_DIR/Tools/simulation/gz/models"
 CMAKE="$AIRFRAMES/CMakeLists.txt"
 BUILD_AF="$PX4_DIR/build/px4_sitl_default/etc/init.d-posix/airframes"   # copy PX4 reads at runtime
 
+# World Parameters
+WORLDS="$PX4_DIR/Tools/simulation/gz/worlds"
+
 # Airframe names used by earlier versions of this repository. They collide with the
 # current ones (same make target or same ID), so they are removed on install/uninstall.
 LEGACY_AIRFRAMES="4051_gz_f550"
@@ -181,6 +229,7 @@ LEGACY_AIRFRAMES="4051_gz_f550"
 [ -d "$MODELS" ]    || { echo "ERROR: missing $MODELS. Run 'git submodule update --init --recursive' inside PX4-Autopilot."; exit 1; }
 [ -f "$CMAKE" ]     || { echo "ERROR: missing $CMAKE"; exit 1; }
 
+[ -d "$WORLDS" ] || { echo "ERROR: missing $WORLDS. Run 'git submodule update --init --recursive' inside PX4-Autopilot."; exit 1; }
 # ----------------------------------------------------------------------------
 # Helpers that edit airframes/CMakeLists.txt (the list of packaged airframes)
 # ----------------------------------------------------------------------------
@@ -233,11 +282,47 @@ clean_stale_build_airframes() {
   done
 }
 
+check_world_name() {
+  local f="$1" base inner
+  base="$(basename "$f" .sdf)"
+  inner="$(grep -oE "<world[[:space:]]+name=['\"][^'\"]+['\"]" "$f" | head -n1 | sed -E "s/.*name=['\"]([^'\"]+)['\"]/\1/" || true)"
+  if [ -n "$inner" ] && [ "$inner" != "$base" ]; then
+    echo "    WARNING: $(basename "$f") has <world name='$inner'> but the file is '$base'. Rename one of them."
+  fi
+}
+
+# Some PX4 versions hard-code the list of worlds in a CMake file. If so, find it
+# (it contains the stock world "baylands" alone on a line) and add ours.
+world_list_file() {
+  grep -rlE '^[[:space:]]*baylands[[:space:]]*$' \
+    "$PX4_DIR/src/modules/simulation/gz_bridge" \
+    "$PX4_DIR/platforms/posix/cmake" 2>/dev/null | head -n1 || true
+}
+
+register_world() {
+  local w="$1" f
+  f="$(world_list_file)"
+  if [ -z "$f" ]; then
+    echo "    $w: no hard-coded world list found (this PX4 detects worlds by itself)"
+  elif grep -qE "^[[:space:]]*$w[[:space:]]*$" "$f"; then
+    echo "    $w already registered in $(basename "$f")"
+  else
+    awk -v w="$w" '{print} /^[ \t]*baylands[ \t]*$/ {print "\t" w}' "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+    echo "    $w added to $f"
+  fi
+}
+
+unregister_world() {
+  local f; f="$(world_list_file)"
+  [ -n "$f" ] && sed -i "/^[[:space:]]*$1[[:space:]]*$/d" "$f" || true
+}
+
 # ----------------------------------------------------------------------------
 # 3. Install (or uninstall) every selected variant
 # ----------------------------------------------------------------------------
 clean_legacy_airframes
 NEED_MESHES=0
+
 for v in $SELECTED; do
   VDIR="$HERE/variants/$v"
 
@@ -337,17 +422,63 @@ elif [ "$NEED_MESHES" = 1 ]; then
 fi
 
 # ----------------------------------------------------------------------------
-# 5. Remove parameters PX4 saved in previous runs
-#    `param set-default` in the airframe only sets DEFAULT values. A value that
-#    was saved explicitly (e.g. `param set CA_ROTOR0_PY ...` followed by
-#    `param save`) is stored in build/px4_sitl_default/rootfs/parameters*.bson
-#    and wins over the default. Deleting these files (and the dataman database)
-#    guarantees a clean start. Note: when SYS_AUTOSTART changes (switching
-#    variants) PX4 already resets its parameters by itself.
+# 4b. Worlds -> Tools/simulation/gz/worlds/ (+ registration if PX4 needs it)
+# ----------------------------------------------------------------------------
+if [ -d "$WORLDS_SRC" ]; then
+  if [ "$UNINSTALL" = 1 ]; then
+    if [ "$VARIANT" = "all" ]; then
+      for w in $(repo_worlds); do
+        rm -f "$WORLDS/$w"; unregister_world "${w%.sdf}"
+        echo "--> Removed world $w"
+      done
+      if [ -d "$WORLD_MODELS_SRC" ]; then
+        for m in $(find "$WORLD_MODELS_SRC" -mindepth 1 -maxdepth 1 -type d -printf '%f\n'); do
+          rm -rf "$MODELS/$m"; echo "--> Removed world model $m"
+        done
+      fi
+    else
+      echo "--> Worlds kept (use --variant all to remove them too)"
+    fi
+  else
+    for w in $(repo_worlds); do
+      cp "$WORLDS_SRC/$w" "$WORLDS/$w"
+      echo "--> World $w -> $WORLDS/$w"
+      check_world_name "$WORLDS_SRC/$w"
+      register_world "${w%.sdf}"
+    done
+    if [ -d "$WORLD_MODELS_SRC" ]; then
+      for m in $(find "$WORLD_MODELS_SRC" -mindepth 1 -maxdepth 1 -type d ! -name '.*' -printf '%f\n'); do
+        mkdir -p "$MODELS/$m"
+        cp -r "$WORLD_MODELS_SRC/$m/." "$MODELS/$m/"
+        echo "--> World model $m -> $MODELS/$m"
+      done
+    fi
+  fi
+fi
+
+# ----------------------------------------------------------------------------
+# 5. Clean PX4 state that would hide what was just installed
+#    a) Parameters saved in previous runs. `param set-default` in the airframe
+#       only sets DEFAULT values; a value saved explicitly (param set ... +
+#       param save) lives in rootfs/parameters*.bson and wins over the default.
+#       Deleting these files (and the dataman database) guarantees a clean start.
+#       Note: when SYS_AUTOSTART changes (switching variants) PX4 already
+#       resets its parameters by itself.
+#    b) CMakeCache.txt. The make targets gz_<name> are generated when CMake
+#       configures the build, from the airframes that exist at that moment. A
+#       cache older than the new airframes/worlds makes "make px4_sitl gz_<name>"
+#       fail with "target does not exist". Deleting it forces a reconfigure on
+#       the next make (a bit slower once, harmless).
 # ----------------------------------------------------------------------------
 echo "--> Removing parameters saved by previous PX4 runs (if any)"
 rm -f "$PX4_DIR"/build/px4_sitl_default/rootfs/parameters*.bson \
       "$PX4_DIR"/build/px4_sitl_default/rootfs/dataman
+
+if [ "$KEEP_CACHE" = 0 ]; then
+  echo "--> Removing CMakeCache.txt so the next make regenerates the targets"
+  rm -f "$PX4_DIR/build/px4_sitl_default/CMakeCache.txt"
+fi
+
 
 # ----------------------------------------------------------------------------
 # 6. Tell the user what to run next
@@ -356,11 +487,20 @@ echo
 if [ "$UNINSTALL" = 1 ]; then
   echo "Done. Rebuild PX4 (make px4_sitl gz_x500) so the build forgets the removed airframes."
 else
-  echo "Done. The first build recompiles because CMakeLists.txt changed. Launch with:"
+  echo "Done. Launch with:"
+  FIRST_TARGET=""
   for v in $SELECTED; do
     for id in $(variant_airframes "$v"); do
       echo "  cd $PX4_DIR && make px4_sitl ${id#*_}"
+      if [ -z "$FIRST_TARGET" ]; then FIRST_TARGET="${id#*_}"; fi
     done
   done
-  echo "If make says the target does not exist: rm -f $PX4_DIR/build/px4_sitl_default/CMakeCache.txt and retry."
+  for w in $(repo_worlds); do
+    echo "  PX4_GZ_WORLD=${w%.sdf} make px4_sitl ${FIRST_TARGET:-gz_x500}"
+  done
+  if [ "$KEEP_CACHE" = 0 ]; then
+    echo "The first make reconfigures PX4 (CMakeCache.txt was removed), so it takes longer than usual."
+  else
+    echo "If make says the target does not exist: rm -f $PX4_DIR/build/px4_sitl_default/CMakeCache.txt and retry."
+  fi
 fi
