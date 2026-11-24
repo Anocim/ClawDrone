@@ -42,6 +42,19 @@ is kept below 2 because Humble's compiled packages are built against NumPy 1
 and `cv_bridge` breaks otherwise; this package converts images with NumPy
 instead of `cv_bridge`.
 
+## Model weights
+
+Weights are not committed. Place the Ultralytics `.pt` file in
+[`f550_ws/models/`](../../models/README.md): the folder is kept in Git with a
+`.gitkeep`, while a local `.gitignore` keeps every supplied weight file out of
+version control. Each checkout supplies its own file. Pass its absolute path
+with `model_path:=` (the example assumes `best.pt` in that folder and is run
+from `f550_ws/`):
+
+```bash
+ros2 launch f550_vision detector.launch.py model_path:=$PWD/models/best.pt
+```
+
 ## Build
 
 ```bash
@@ -58,8 +71,8 @@ source install/setup.bash
 # Camera only (bridge + frame rate report)
 ros2 launch f550_vision camera.launch.py
 
-# Camera + YOLO
-ros2 launch f550_vision detector.launch.py model_path:=/abs/path/best.pt
+# Camera + YOLO (requires your own weights in f550_ws/models/, see above)
+ros2 launch f550_vision detector.launch.py model_path:=$PWD/models/best.pt
 ```
 
 Launch arguments: `world` (`tenis`), `model` (`f550_detailed_mono_cam_down_0`,
@@ -90,7 +103,7 @@ Image display in RViz. Camera topics use sensor QoS (best effort).
 
 | Parameter | Default | Meaning |
 | --- | --- | --- |
-| `model_path` | (required) | Absolute path to the Ultralytics `.pt` file |
+| `model_path` | (required) | Absolute path to the Ultralytics `.pt` file (see [Model weights](#model-weights)) |
 | `conf_threshold` | 0.4 | Minimum score, in (0, 1] |
 | `imgsz` | 640 | Inference size |
 | `device` | `''` | `''` automatic, `cpu`, or a CUDA index such as `0` |

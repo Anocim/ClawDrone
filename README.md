@@ -127,7 +127,7 @@ cd ~/ClawDrone/f550_ws
 source /opt/ros/humble/setup.bash
 source install/setup.bash
 ros2 launch f550_vision camera.launch.py
-# or: ros2 launch f550_vision detector.launch.py model_path:=/abs/path/best.pt
+# or: ros2 launch f550_vision detector.launch.py model_path:=$PWD/models/best.pt
 ```
 
 **Terminal 5 — telemetry monitor** (optional):

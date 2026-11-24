@@ -1,0 +1,6 @@
+# Model weights are supplied by each user and are never committed.
+# Keep this folder in Git with .gitkeep (and the instructions in README.md).
+*
+!.gitkeep
+!.gitignore
+!README.md

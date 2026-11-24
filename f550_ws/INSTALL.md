@@ -42,11 +42,13 @@ Fortress bridge over the Harmonic one from step 1.
 sudo apt install python3.10-venv
 scripts/setup_vision_env.sh            # CPU-only PyTorch; add --cuda for NVIDIA
 source ~/yolo_env/bin/activate
-python3 -c "from ultralytics import YOLO; print(YOLO('/abs/path/best.pt').names)"
+python3 -c "from ultralytics import YOLO; print(YOLO('$HOME/ClawDrone/f550_ws/models/best.pt').names)"
 ```
 
-Model weights (`*.pt`) are large and must not be committed; keep them outside
-the repository and pass their path with `model_path:=`.
+Model weights (`*.pt`) are large and must not be committed. Put your file in
+`f550_ws/models/` (the folder is versioned with a `.gitkeep`, but its contents
+are ignored by its own `.gitignore`), then pass its absolute path with
+`model_path:=`. See [`models/README.md`](models/README.md).
 
 ## 4. Build the workspace (environment active)
 

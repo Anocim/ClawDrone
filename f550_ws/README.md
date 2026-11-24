@@ -28,6 +28,7 @@ f550_ws/
 ├── INSTALL.md               # dependency installation (ROS, Gazebo bridge, YOLO)
 ├── README.md                # this file
 ├── requirements-vision.txt  # pip requirements for the detector
+├── models/                  # user-supplied .pt weights (git-ignored, see models/README.md)
 ├── scripts/
 │   └── setup_vision_env.sh  # creates ~/yolo_env (see scripts/README.md)
 └── src/
@@ -134,7 +135,7 @@ ros2 run f550_monitor telemetry_monitor
 
 # With a *_mono_cam_down variant running in PX4/Gazebo and ~/yolo_env active:
 ros2 launch f550_vision camera.launch.py
-ros2 launch f550_vision detector.launch.py model_path:=/abs/path/best.pt
+ros2 launch f550_vision detector.launch.py model_path:=$PWD/models/best.pt
 ```
 
 Run the nodes in separate terminals from the DDS agent and PX4 SITL; see the
