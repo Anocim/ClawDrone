@@ -6,6 +6,9 @@ Python 3 and `ament_python`. `telemetry.py` evaluates snapshots without ROS;
 It never arms, changes modes, or publishes PX4 commands or emergency overrides.
 Existing `f550_control` and `px4_msgs` packages are independent and unchanged.
 
+See the [complete launch example](../../../README.md#complete-launch-example-one-terminal-per-process)
+for where this package fits in a full session.
+
 ## Topics and dependencies
 
 | Direction | Topic | Type |

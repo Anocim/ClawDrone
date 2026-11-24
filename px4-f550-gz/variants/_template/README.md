@@ -1,6 +1,8 @@
 # Variant template
 
-Copy this folder to `variants/<your_variant>/` and create:
+Copy this folder to `variants/<your_variant>/`. See the
+[variants index](../README.md) for the list of existing variants and their
+IDs. Create:
 
 ```
 variants/<your_variant>/
@@ -21,4 +23,7 @@ Checklist:
 4. Add a `README.md` in the variant with its motor layout and make target.
 5. If your SDF uses `model://mrs_robots_description/...`, the installer copies the bundled meshes automatically;
    add any extra mesh you need to `third_party/mrs_robots_description/` keeping the upstream sub-paths.
-6. Check with `./install.sh --list`, then `./install.sh --variant <your_variant>`.
+6. If the new model extends another variant, add a `requires` file containing that base variant's
+   folder name (one per line). The installer then installs the base automatically. The
+   `*_mono_cam_down` variants are examples.
+7. Check with `./install.sh --list`, then `./install.sh --variant <your_variant>` (folder name).

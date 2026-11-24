@@ -3,6 +3,7 @@
 Simple DJI F550 model: primitive shapes (boxes and cylinders) instead of meshes, lighter body, same six-motor
 layout. PX4 airframe `4051_gz_f550_simple`, run with `make px4_sitl gz_f550_simple`.
 Use it when you want a fast, lightweight simulation or a starting point for your own model.
+See the [variants index](../README.md).
 
 | Path | Installed into `PX4-Autopilot/` | Purpose |
 |---|---|---|

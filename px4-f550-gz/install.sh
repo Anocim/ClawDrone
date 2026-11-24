@@ -30,7 +30,8 @@
 #   Any folder in variants/ that has at least one airframe file is picked up
 #   automatically; this script never needs editing to add a variant.
 #   Folders starting with "_" (e.g. _template) and variants without an airframe
-#   file (e.g. the empty f550_simple placeholder) are ignored.
+#   file are ignored. A variant can list base variants in a "requires" file;
+#   those are installed recursively (except when uninstalling).
 #
 # USAGE
 #   ./install.sh [--px4 PATH] [--variant NAME|all] [--no-meshes] [--uninstall]
@@ -38,11 +39,13 @@
 #
 # OPTIONS
 #   --px4 PATH     Path to your PX4-Autopilot checkout. Default: ~/PX4-Autopilot
-#   --variant NAME Install only this variant. Default: all (every installable variant).
+#   --variant NAME Install only this folder name (see --list). Default: all.
+#                  Variants listed in its "requires" file are installed too.
+#                  The detailed model is "f550", not "f550_detailed".
 #   --no-meshes    Do not copy the bundled meshes (third_party/mrs_robots_description).
 #   --uninstall    Remove what a previous install copied and the CMakeLists.txt line.
-#                  The bundled meshes are removed only with --variant all (they may
-#                  be shared by several variants).
+#                  The bundled meshes and worlds are removed only with --variant all
+#                  (they may be shared by several variants).
 #   --list         Show the variants and the `make` target of each, then exit.
 #   --keep-cache   Do not delete build/px4_sitl_default/CMakeCache.txt. By default it is
 #                  deleted so new airframes/worlds get their make target.
@@ -51,7 +54,7 @@
 # EXAMPLES
 #   ./install.sh --list
 #   ./install.sh                                  # everything, PX4 in ~/PX4-Autopilot
-#   ./install.sh --px4 /opt/PX4-Autopilot --variant f550_detailed
+#   ./install.sh --px4 /opt/PX4-Autopilot --variant f550
 #   ./install.sh --uninstall
 #
 # GOOD TO KNOW

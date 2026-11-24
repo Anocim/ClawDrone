@@ -1,6 +1,9 @@
-# f550_detailed
+# f550 (detailed)
 
 Detailed DJI F550 model. PX4 airframe `4050_gz_f550`, run with `make px4_sitl gz_f550`.
+This is the folder named `f550`; `--variant f550` is the correct installer
+option (there is no `f550_detailed` folder). See the
+[variants index](../README.md).
 
 | Path | Installed into `PX4-Autopilot/` | Purpose |
 |---|---|---|
@@ -62,8 +65,8 @@ poses in `models/f550_base/model.sdf`, then regenerate the parameters:
 
 ```sh
 python3 tools/gen_ca.py \
-  variants/f550_detailed/models/f550/model.sdf \
-  variants/f550_detailed/models/f550_base/model.sdf --km 0.06
+  variants/f550/models/f550/model.sdf \
+  variants/f550/models/f550_base/model.sdf --km 0.06
 ```
 
 Paste the `param set-default CA_ROTOR...` lines into `airframe/4050_gz_f550`, rerun `./install.sh`, and rebuild.

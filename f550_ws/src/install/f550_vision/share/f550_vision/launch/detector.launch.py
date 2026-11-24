@@ -1,1 +1,0 @@
-/home/alejandro/ClawDrone/ClawDrone/f550_ws/src/build/f550_vision/launch/detector.launch.py

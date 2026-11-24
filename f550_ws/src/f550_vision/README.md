@@ -10,6 +10,9 @@ Pure logic lives apart from ROS so it can be tested without a simulator:
 them to ROS. Images are converted with NumPy instead of `cv_bridge`, because
 `cv_bridge` on Humble breaks when pip installs NumPy 2.
 
+See the [complete launch example](../../../README.md#complete-launch-example-one-terminal-per-process)
+for where this package fits in a full session.
+
 ## Requirements
 
 * The Gazebo-ROS bridge must match PX4's Gazebo (`gz sim --versions`). With
@@ -20,17 +23,24 @@ them to ROS. Images are converted with NumPy instead of `cv_bridge`, because
 
 ## Python environment for YOLO
 
+Create the environment with the workspace helper script (it is the single
+source of truth for the pip setup; see
+[`scripts/README.md`](../../scripts/README.md) and
+[`INSTALL.md`](../../INSTALL.md)):
+
 ```bash
-python3 -m venv --system-site-packages ~/yolo_env
+cd f550_ws
+scripts/setup_vision_env.sh            # CPU-only PyTorch; add --cuda for NVIDIA
 source ~/yolo_env/bin/activate
-pip install "numpy<2"
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu   # CPU only
-pip install ultralytics
 ```
 
-Skip the CPU index line if the machine has an NVIDIA GPU and you want CUDA.
-`--system-site-packages` keeps `rclpy` visible. **Build the workspace with the
-environment active** so the node executables use this Python.
+The script creates `~/yolo_env` with `--system-site-packages` so `rclpy` stays
+visible, installs `numpy<2`, PyTorch (from the CPU index unless `--cuda` is
+given) and the packages in `requirements-vision.txt`. **Build the workspace
+with the environment active** so the node executables use this Python. NumPy
+is kept below 2 because Humble's compiled packages are built against NumPy 1
+and `cv_bridge` breaks otherwise; this package converts images with NumPy
+instead of `cv_bridge`.
 
 ## Build
 

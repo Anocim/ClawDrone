@@ -1,6 +1,7 @@
 # Tennis World for PX4 SITL and Gazebo Sim
 
 This directory contains the `tenis` world used for DJI F550 ball-retrieval experiments with PX4 SITL and Gazebo Sim.
+See the [px4-f550-gz README](../README.md) for the variants that can fly in it.
 
 The world is self-contained in `tenis.sdf`. The court, court markings, net, collection table and four tennis balls are defined with SDF geometry. No additional Gazebo model folders, meshes or textures are required to load this world.
 
@@ -82,11 +83,19 @@ The world can also be opened in Gazebo without PX4.
 
 ## Installation
 
-Copy `tenis.sdf` into the PX4 Gazebo worlds directory:
+`install.sh` copies `tenis.sdf` into the PX4 Gazebo worlds directory and, if
+that PX4 version needs it, registers the world. Run it from `px4-f550-gz/`:
 
 ```bash
-mkdir -p ~/Firmware/Tools/simulation/gz/worlds
-cp tenis.sdf ~/Firmware/Tools/simulation/gz/worlds/tenis.sdf
+./install.sh --list
+./install.sh --px4 ~/PX4-Autopilot
+```
+
+For a manual copy instead:
+
+```bash
+mkdir -p ~/PX4-Autopilot/Tools/simulation/gz/worlds
+cp tenis.sdf ~/PX4-Autopilot/Tools/simulation/gz/worlds/tenis.sdf
 ```
 
 No additional model installation is required for the court, net, table or balls; they are defined in the SDF file.
@@ -94,7 +103,7 @@ No additional model installation is required for the court, net, table or balls;
 ## Run Gazebo without PX4
 
 ```bash
-gz sim -r ~/Firmware/Tools/simulation/gz/worlds/tenis.sdf
+gz sim -r ~/PX4-Autopilot/Tools/simulation/gz/worlds/tenis.sdf
 ```
 
 This starts Gazebo with the tennis world only.
@@ -104,7 +113,7 @@ This starts Gazebo with the tennis world only.
 The F550 model and its PX4 airframe must already be installed in the PX4 checkout. From the PX4 directory, run:
 
 ```bash
-cd ~/Firmware
+cd ~/PX4-Autopilot
 PX4_GZ_WORLD=tenis make px4_sitl gz_f550
 ```
 

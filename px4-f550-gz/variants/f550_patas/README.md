@@ -2,6 +2,7 @@
 
 DJI Flame Wheel F550 hexacopter model for PX4 SITL and Gazebo Harmonic, with six motors and three
 landing legs. PX4 airframe `4052_gz_f550_patas`, run with `make px4_sitl gz_f550_patas`.
+See the [variants index](../README.md).
 
 This variant preserves the physical model and control configuration copied from the working local
 PX4 model `Tools/simulation/gz/models/f550/` and airframe `22001_gz_f550`. Its separate model name,
@@ -111,8 +112,10 @@ Keep the motor indices, positions, directions and `KM` signs together when revie
 ## Requirements
 
 - A PX4-Autopilot checkout with SITL build dependencies, Gazebo integration and initialized simulation
-  submodules. Static review used local PX4 `v1.18.0-beta1-1230-g989a01382b`; this is not a runtime
-  compatibility certification or a minimum supported version.
+  submodules. Static review used local PX4 `v1.18.0-beta1-1230-g989a01382b`, while the main repository
+  checkout is pinned to `95ede794c0` (`v1.18.0-beta1-1084-g95ede794c0`); see the
+  [compatibility notes](../../../README.md#compatibility-notes). Neither hash is a runtime compatibility
+  certification or a minimum supported version.
 - Gazebo Harmonic with SDF 1.9 support, the `gz-sim-multicopter-motor-model-system` plugin and the
   sensor systems required by the PX4 Gazebo world. Runtime loading remains to be checked.
 - Bash and the standard tools used by `install.sh`, including GNU `find`, `cp`, `grep`, `awk` and `sed`.
@@ -142,7 +145,8 @@ The script discovers this variant automatically and copies its local meshes and 
 simple airframes share the `gz_f550` target with the original `22001_gz_f550`; detailed also installs
 over the original `models/f550/`. Those conflicts are outside this variant's scope. Patas uses its
 own ID `4052`, target and model directory. Check that the destination has no unrelated files using
-that ID, target or directory; the installer only checks conflicting numeric airframe IDs.
+that ID, target or directory; the installer checks both conflicting numeric airframe IDs and
+conflicting make targets.
 
 After installation, launch from the selected PX4 checkout:
 

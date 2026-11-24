@@ -1,14 +1,16 @@
 # Installing the workspace dependencies
 
 Dependencies come from four places. Each one has its own mechanism, so each
-one is listed where its tool expects it.
+one is listed where its tool expects it. See the
+[repository README](../README.md#complete-launch-example-one-terminal-per-process)
+for the complete launch example once everything is installed.
 
 | What | Where it is declared | Installed with |
 | --- | --- | --- |
 | ROS packages and system libraries used by a package (`vision_msgs`, `python3-numpy`, ...) | `<exec_depend>` in each `package.xml` | `rosdep` |
 | Gazebo-ROS bridge for Gazebo Harmonic | this file (OSRF repository) | `apt`, by hand |
 | Python packages for YOLO (`ultralytics`, `numpy<2`, `torch`) | `requirements-vision.txt` | `scripts/setup_vision_env.sh` |
-| PX4 models, airframes and worlds | `variants/`, `worlds/` of the PX4 repository | `install.sh` |
+| PX4 models, airframes, meshes and worlds | `variants/`, `third_party/` and `worlds/` of **this** repository (`px4-f550-gz/`) | `px4-f550-gz/install.sh` |
 
 ## 1. Gazebo-ROS bridge (Gazebo Harmonic + ROS 2 Humble)
 
@@ -58,5 +60,15 @@ source install/setup.bash
 
 ## 5. PX4 side
 
-Run `./install.sh` from the PX4 repository (models, airframes, worlds). See its
-header for options.
+From this repository, run the installer with the PX4 checkout as an argument.
+It copies the models, airframes, bundled meshes and the `tenis` world, and
+registers the make targets:
+
+```bash
+cd ClawDrone/px4-f550-gz
+./install.sh --list
+./install.sh --px4 ~/PX4-Autopilot
+```
+
+See [px4-f550-gz/README.md](../px4-f550-gz/README.md#installation) for all
+options, the list of variants and the manual equivalent.

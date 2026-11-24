@@ -1,7 +1,11 @@
 # ROS 2 / colcon generated artifacts
+# Builds have been run both at the workspace root and inside src/; ignore both.
 /f550_ws/build/
 /f550_ws/install/
 /f550_ws/log/
+/f550_ws/src/build/
+/f550_ws/src/install/
+/f550_ws/src/log/
 /build/
 /install/
 /log/
